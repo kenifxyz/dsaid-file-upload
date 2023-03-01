@@ -27,7 +27,9 @@ function FirstStep(props) {
   // funcs
   const onVideoSelect = (video) => {
     setSelectedVideo(video);
+    console.log("creating thumbnail url")
     setThumbnailUrl(URL.createObjectURL(video));
+    console.log("ok")
   };
   
   const handleFileChange = (event) => {
@@ -103,11 +105,23 @@ function FirstStep(props) {
 
   // memos
   const thumbnailComponent = useMemo(() => (
-    <VideoImageThumbnail
-      videoUrl={thumbnailUrl}
-      renderThumbnailHtml={false}
-      thumbnailHandler={(thumbnail) => setThumbnailData(thumbnail)}
-    />
+    <div key={thumbnailUrl} style={{
+      // hide the thumbnail generator component
+      position: "absolute",
+      zIndex: -1,
+      width: "0",
+      height: "0",
+    }}>
+      <VideoImageThumbnail
+        videoUrl={thumbnailUrl}
+        renderThumbnailHtml={false}
+        thumbnailHandler={(thumbnail) => {
+          console.log("setting thumbnail data")
+          setThumbnailData(thumbnail)
+          console.log("ok")
+        }}
+      />
+    </div>
   ), [thumbnailUrl]);
 
   // listeners
@@ -138,12 +152,8 @@ function FirstStep(props) {
           <Typography variant="body1">
             {thumbnailData == "" ? "Loading Preview.." : "Video Preview"}
           </Typography>
-          <div style={{
-            // hide the thumbnail generator component
-            position: "absolute",
-            zIndex: -1,
-          }}>
-          {thumbnailComponent}
+          <div>
+            {thumbnailComponent}
           </div>
           {
             thumbnailData != "" && (
