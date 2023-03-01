@@ -1,20 +1,109 @@
 import { useRef, useState, useEffect } from 'react';
 import { Typography, TextField, Button, FormControl, FormLabel, InputLabel, Input, FormHelperText, Checkbox, FormControlLabel, Alert, AlertTitle, CircularProgress, LinearProgress, Box } from '@mui/material';
+import axios from 'axios';
 
 function ThirdStep(props) {
+  let file_upload_endpoint = "http://127.0.0.1:8001/upload"
+
   // states
+  const [data, setData] = useState(props.metadata)
   const [progressAvailable, setProgressAvailable] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
-  const [uploadRunning, setUploadRunning] = useState(true);
+  const [uploadRunning, setUploadRunning] = useState(false);
   const [uploadCompleted, setUploadCompleted] = useState(false);
   const [uploadResult, setUploadResult] = useState(false);
   const [failReason, setFailReason] = useState("");
+  const [uploadCancelled, setUploadCancelled] = useState(false);
   
   // refs
+  const uploadRequestRef = useRef(null);
+  const cancelTokenRef = useRef(null);
 
   // funcs
+  const cancelUpload = () => {
+    if (cancelTokenRef.current) {
+      cancelTokenRef.current.cancel();
+    }
+      setUploadRunning(false);
+      setUploadCompleted(true);
+      setUploadCancelled(true);
+      setUploadResult(false);
+      setFailReason("Upload was cancelled.");
+  }
+  
+  const uploadVideo = (file, metadata, onUploadProgress) => {
+    const formData = new FormData();
+    formData.append('video', file);
+    formData.append('title', metadata.title);
+    formData.append('startDateTime', metadata.startDateTime);
+    formData.append('location', metadata.location);
+    formData.append('termsChecked', metadata.termsChecked);
+  
+    cancelTokenRef.current = axios.CancelToken.source();
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      onUploadProgress,
+      cancelToken: cancelTokenRef.current.token
+    };
 
+    uploadRequestRef.current = axios.post(file_upload_endpoint, formData, config);
+  
+    return uploadRequestRef.current.then(response => {
+        console.log(response.data.message);
+        setUploadRunning(false)
+        setUploadCompleted(true)
+        setUploadResult(true)
+        setProgressValue(100);
+        // do something with the response data
+      })
+      .catch(error => {
+        if (axios.isCancel(error)) {
+          console.log("Upload cancelled by user.");
+        } else {
+          setUploadRunning(false)
+          setUploadCompleted(true)
+          setUploadResult(false)
+          console.log(error)
+          if (error.response) {
+            if (error.response.status == 400 && error.response.data.message) {
+              setFailReason(error.response.data.message)
+            } else if (error.response.status == 500 && error.response.data) {
+              let errorHtml = error.response.data;
+              setFailReason(error.response.data.split("<pre>")[1].split("</pre>")[0])
+            }
+          } else {
+            // console.log("Upload Failed", error.stack);
+            setFailReason(error.message)
+          }
+          // handle the error
+        }
+      });
+  };
+
+  const handleUpload = () => {
+    console.log("starting upload")
+    const onUploadProgress = (progressEvent) => {
+      const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      setProgressAvailable(true)
+      setUploadRunning(true)
+      setProgressValue(percentage);
+    };
+  
+    uploadVideo(data.selectedVideo, data, onUploadProgress);
+  };
+  
   // listeners
+  useEffect(() => {
+    if (data && !uploadRunning && !uploadCancelled) {
+      console.log(data)
+      console.log("attempting to upload..")
+      setUploadRunning(true)
+      handleUpload()
+    }
+  }, [data])
+  
 
   return (
     <div style={{
@@ -71,7 +160,7 @@ function ThirdStep(props) {
         type="submit" 
         sx={{ mt: 3, minWidth: 120 }} 
         onClick={() => {
-          
+          cancelUpload()
         }}
         >
         Cancel Upload
