@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { Grid, Paper, Box, Typography, Link, Breadcrumbs, Divider } from '@mui/material';
+import { Grid, Paper, Box, Typography, Link, Breadcrumbs, Divider, Button } from '@mui/material';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -101,6 +101,7 @@ function App() {
           <Typography variant="h4" component="div" gutterBottom>
             DSAID File Upload
           </Typography>
+          <Button onClick={() => setCurrentStep(2)}>Restart</Button>
           <Breadcrumbs separator="›" aria-label="breadcrumb">
             {breadcrumbs}
           </Breadcrumbs>
@@ -128,6 +129,7 @@ function App() {
           {
             currentStep == 3 && (
               <ThirdStep
+              metadata={metadata}
               restartUpload={restartUpload}
               />
             )
