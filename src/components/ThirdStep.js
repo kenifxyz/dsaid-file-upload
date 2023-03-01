@@ -210,7 +210,10 @@ function ThirdStep(props) {
 function SuccessAlert(props) {
   let videoWatchUrl = props.videoWatchUrl
   return (
-    <Alert severity="success">
+    <Alert severity="success" style={{
+      padding: "2em",
+      borderRadius: "1.5em",
+    }}>
       <AlertTitle><strong>Upload completed successfully! 🎉</strong></AlertTitle>
       <Typography>You can watch it at <a href={videoWatchUrl} target="_blank" rel="noreferrer">{videoWatchUrl}</a></Typography>
     </Alert>
@@ -219,7 +222,10 @@ function SuccessAlert(props) {
 
 function FailureAlert(props) {
   return (
-    <Alert severity="error">
+    <Alert severity="error" style={{
+      padding: "2em",
+      borderRadius: "1.5em",
+    }}>
       <AlertTitle><strong>Upload Failed 😔</strong></AlertTitle>
       <Typography>Reason: {props.reason}</Typography>
     </Alert>
