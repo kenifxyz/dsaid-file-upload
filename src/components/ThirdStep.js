@@ -15,7 +15,7 @@ function ThirdStep(props) {
   const [uploadResult, setUploadResult] = useState(false);
   const [failReason, setFailReason] = useState("");
   const [uploadCancelled, setUploadCancelled] = useState(false);
-  const [uploadingText, setUploadingText] = useState("Starting transfer 🚀");
+  const [uploadingText, setUploadingText] = useState("Starting Upload 🚀");
   
   // refs
   const uploadRequestRef = useRef(null);
@@ -93,14 +93,14 @@ function ThirdStep(props) {
       setProgressAvailable(true)
       setUploadRunning(true)
       setProgressValue(percentage);
-      if (percentage > 20) {
-        setUploadingText("Moving along..")
-      } else if (percentage > 50) {
-        setUploadingText("Getting closer..")
+      if (percentage === 100) {
+        setUploadingText("Done! 🎉")
       } else if (percentage > 75) {
-        setUploadingText("Hang tight, almost there!")
-      } else if (percentage === 100) {
-        setUploadingText("Done!")
+        setUploadingText("Hang tight, almost there! 🔥")
+      } else if (percentage > 50) {
+        setUploadingText("Getting closer.. 👣")
+      } else if (percentage > 20) {
+        setUploadingText("Moving along 🚶🏻‍♂️")
       }
     };
   

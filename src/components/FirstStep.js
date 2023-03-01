@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { Typography, TextField, Button, FormControl, FormLabel, InputLabel, Input, FormHelperText } from '@mui/material';
 import VideoImageThumbnail from 'react-video-thumbnail-image';
 
@@ -101,6 +101,15 @@ function FirstStep(props) {
     }
   };
 
+  // memos
+  const thumbnailComponent = useMemo(() => (
+    <VideoImageThumbnail
+      videoUrl={thumbnailUrl}
+      renderThumbnailHtml={false}
+      thumbnailHandler={(thumbnail) => setThumbnailData(thumbnail)}
+    />
+  ), [thumbnailUrl]);
+
   // listeners
   useEffect(() => {
     if (selectedVideo && selectedVideo != "") {
@@ -127,23 +136,20 @@ function FirstStep(props) {
           alignItems: "center",
         }}>
           <Typography variant="body1">
-            Video Thumbnail Preview
+            {thumbnailData == "" ? "Loading Preview.." : "Video Preview"}
           </Typography>
           <div style={{
             // hide the thumbnail generator component
             position: "absolute",
             zIndex: -1,
           }}>
-          <VideoImageThumbnail
-            videoUrl={thumbnailUrl}
-            renderThumbnailHtml={false}
-            thumbnailHandler={(thumbnail) => setThumbnailData(thumbnail)}
-            />
+          {thumbnailComponent}
           </div>
           {
             thumbnailData != "" && (
               <img src={thumbnailData} alt="Video Thumbnail" style={{
-                width: "60%",
+                maxWidth: "60%",
+                maxHeight: "10em",
                 height: "auto",
                 borderRadius: "1.5em",
               }}/>
