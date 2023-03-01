@@ -48,7 +48,7 @@ const Video = sequelize.define('Video', {
 }, {
   timestamps: true, // disable timestamps (createdAt, updatedAt)
 });
-sequelize.sync();
+// sequelize.sync(); // create the Video table if it doesn't already exist 
 
 // configure multer to store uploaded files in the 'uploads' directory
 // ideally would want to relay this to s3 or something
@@ -88,6 +88,17 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     });
   }
 
+  // validate file extension (must be .mp4 or .mov)
+  const validExtensions = ['mp4', 'mov'];
+  const fileExtension = req.file.originalname.split('.').pop().toLowerCase();
+  if (!validExtensions.includes(fileExtension)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid file extension',
+    });
+  }
+  
+
   // create a new Video instance with the metadata and filename
   const newVideo = await Video.create({
     title,
@@ -100,7 +111,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
   // get the Id of the newly created Video instance
   const videoId = newVideo.id;
 
-  const storagePath = `uploads/${videoId}.${file.originalname.split('.').pop()}`;
+  const storagePath = `uploads/${videoId}.${req.file.originalname.split('.').pop()}`;
   console.log(storagePath)
   // rename the file
   fs.renameSync(`uploads/${req.file.filename}`, storagePath);
@@ -125,22 +136,12 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     res.write(`data: ${percentage.toFixed(2)}\n\n`);
   });
 
-  readStream.on('end', () => {
-    res.write('data: 100\n\n');
-    res.status(200).json({
-      success: true,
-      message: `Video uploaded with ID ${newVideo.id}`,
-    });
-    res.end();
+  // when completed, send a 200 response
+  res.status(200).json({
+    success: true,
+    message: `Video uploaded with ID ${newVideo.id}`,
   });
 
-  // set up the SSE response headers
-  res.set({
-    'Cache-Control': 'no-cache',
-    'Content-Type': 'text/event-stream',
-    'Connection': 'keep-alive',
-  });
-  res.flushHeaders();
 });
 
 // get route to test database connection

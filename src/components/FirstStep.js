@@ -63,7 +63,7 @@ function FirstStep(props) {
   const validateVideoFile = (file) => {
     // validation logic for video file
     if (file) {
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = file.name.split('.').pop().toLowerCase();
       // console.log(fileExtension)
       if (fileExtension === "mp4" || fileExtension === "mov") { // validate file extensions
         setSubmissionFailed((prevState) => ({ ...prevState, file: false }));

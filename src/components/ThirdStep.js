@@ -6,7 +6,7 @@ function ThirdStep(props) {
   let file_upload_endpoint = "http://127.0.0.1:8001/upload"
 
   // states
-  const [data, setData] = useState(props.metadata)
+  let data = props.metadata;
   const [progressAvailable, setProgressAvailable] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
   const [uploadRunning, setUploadRunning] = useState(false);
@@ -51,7 +51,7 @@ function ThirdStep(props) {
     uploadRequestRef.current = axios.post(file_upload_endpoint, formData, config);
   
     return uploadRequestRef.current.then(response => {
-        console.log(response.data.message);
+        console.log(response);
         setUploadRunning(false)
         setUploadCompleted(true)
         setUploadResult(true)
@@ -85,6 +85,7 @@ function ThirdStep(props) {
   const handleUpload = () => {
     console.log("starting upload")
     const onUploadProgress = (progressEvent) => {
+      // console.log(progressEvent)
       const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
       setProgressAvailable(true)
       setUploadRunning(true)
@@ -102,7 +103,7 @@ function ThirdStep(props) {
       setUploadRunning(true)
       handleUpload()
     }
-  }, [data])
+  }, [])
   
 
   return (
