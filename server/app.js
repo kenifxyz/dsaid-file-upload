@@ -4,6 +4,7 @@ const multer = require('multer');
 const { Sequelize, DataTypes } = require('sequelize');
 const fs = require('fs');
 const cors = require('cors');
+const https = require('https');
 const { v4: uuidv4 } = require('uuid'); // to reduce file upload collisions
 
 dotenv.config();
@@ -12,7 +13,6 @@ const app = express();
 // app.use(cors());
 app.use(cors({
   origin: [
-    'https://dsaid-file-upload.netlify.app',
     'https://dsaid-fe.kenif.xyz'
   ]
 }));
@@ -24,6 +24,7 @@ const dbPort = process.env.DB_PORT;
 const dbName = process.env.DB_NAME;
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;
+const stage = process.env.STAGE;
 
 // create a Sequelize instance and define the Video model
 const sequelize = new Sequelize(`postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`);
@@ -172,6 +173,18 @@ app.get('/test_db', async (req, res) => {
 });
     
 // start the server
-app.listen(port, () => {
-console.log(`App listening at http://localhost:${port}`);
-});
+if (stage == "DEV") {
+  app.listen(port, () => {
+    console.log(`App listening at http://localhost:${port}`);
+    });
+} else if (stage == "PROD") {
+
+  const options = {
+    key: fs.readFileSync(process.env.SSL_KEY),
+    cert: fs.readFileSync(process.env.SSL_CERT)
+  };
+  
+  https.createServer(options, app).listen(443, () => {
+    console.log('Server started on port 443');
+  });
+}
