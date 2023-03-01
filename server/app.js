@@ -9,10 +9,10 @@ const { v4: uuidv4 } = require('uuid'); // to reduce file upload collisions
 dotenv.config();
 
 const app = express();
-app.use(cors());
-// app.use(cors({
-//   origin: 'https://dsaid-file-upload.netlify.app'
-// }));
+// app.use(cors());
+app.use(cors({
+  origin: 'https://dsaid-file-upload.netlify.app'
+}));
 
 const port = process.env.PORT || 8080;
 
