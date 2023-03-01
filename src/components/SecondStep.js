@@ -2,9 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Typography, TextField, Button, FormControl, FormLabel, InputLabel, Input, FormHelperText, Checkbox, FormControlLabel } from '@mui/material';
 
 function SecondStep(props) {
-  let terms = `
-  By using this service, you agree to the following terms and conditions. You may upload videos with metadata such as title, start date time, and location, but must have the necessary rights to do so and ensure the video doesn't infringe on third-party rights. Metadata collected may be used for analytical purposes. By uploading a video, you grant us a non-exclusive, worldwide, royalty-free license to use and display it on our platform. We will make reasonable efforts to keep your information secure, but cannot guarantee absolute security.
-  `
+  let terms = `By using this service, you agree to the following terms and conditions. You may upload videos with metadata such as title, start date time, and location, but must have the necessary rights to do so and ensure the video doesn't infringe on third-party rights. Metadata collected may be used for analytical purposes. By uploading a video, you grant us a non-exclusive, worldwide, royalty-free license to use and display it on our platform. We will make reasonable efforts to keep your information secure, but cannot guarantee absolute security.`
   // states
   const [data, setData] = useState({
     termsChecked: props.metadata.termsChecked ? props.metadata.termsChecked : false,
