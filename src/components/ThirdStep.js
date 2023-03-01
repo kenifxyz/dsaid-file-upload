@@ -6,7 +6,7 @@ function ThirdStep(props) {
   let file_upload_endpoint = "http://127.0.0.1:8001/upload"
 
   // states
-  let data = props.metadata;
+  const data = props.metadata;
   const [progressAvailable, setProgressAvailable] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
   const [uploadRunning, setUploadRunning] = useState(false);
@@ -14,10 +14,12 @@ function ThirdStep(props) {
   const [uploadResult, setUploadResult] = useState(false);
   const [failReason, setFailReason] = useState("");
   const [uploadCancelled, setUploadCancelled] = useState(false);
+  const [uploadingText, setUploadingText] = useState("Starting transfer 🚀");
   
   // refs
   const uploadRequestRef = useRef(null);
   const cancelTokenRef = useRef(null);
+  const uploadTriggeredRef = useRef(false);
 
   // funcs
   const cancelUpload = () => {
@@ -51,7 +53,7 @@ function ThirdStep(props) {
     uploadRequestRef.current = axios.post(file_upload_endpoint, formData, config);
   
     return uploadRequestRef.current.then(response => {
-        console.log(response);
+        // console.log(response);
         setUploadRunning(false)
         setUploadCompleted(true)
         setUploadResult(true)
@@ -60,7 +62,7 @@ function ThirdStep(props) {
       })
       .catch(error => {
         if (axios.isCancel(error)) {
-          console.log("Upload cancelled by user.");
+          console.log("Upload cancelled");
         } else {
           setUploadRunning(false)
           setUploadCompleted(true)
@@ -90,6 +92,15 @@ function ThirdStep(props) {
       setProgressAvailable(true)
       setUploadRunning(true)
       setProgressValue(percentage);
+      if (percentage > 20) {
+        setUploadingText("Moving along..")
+      } else if (percentage > 50) {
+        setUploadingText("Getting closer..")
+      } else if (percentage > 75) {
+        setUploadingText("Hang tight, almost there!")
+      } else if (percentage === 100) {
+        setUploadingText("Done!")
+      }
     };
   
     uploadVideo(data.selectedVideo, data, onUploadProgress);
@@ -97,9 +108,11 @@ function ThirdStep(props) {
   
   // listeners
   useEffect(() => {
-    if (data && !uploadRunning && !uploadCancelled) {
-      console.log(data)
-      console.log("attempting to upload..")
+    if (data && !uploadRunning && !uploadCancelled && !uploadTriggeredRef.current) {
+      // console.log("preparing to upload..", uploadTriggeredRef.current)
+      uploadTriggeredRef.current = true;
+      // console.log(data)
+      // console.log("preparing to upload..", uploadTriggeredRef.current)
       setUploadRunning(true)
       handleUpload()
     }
@@ -138,7 +151,7 @@ function ThirdStep(props) {
                 {progressValue}%
               </Typography>
               <Typography variant="h6" sx={{ mt: 0 }}>
-                Uploading..
+                {uploadingText}
               </Typography>
             </>
           )

@@ -25,18 +25,6 @@ function App() {
     termsChecked: false,
   }
   const [metadata, setMetadata] = useState(defaultMetadata);
-  // styles
-  const Item = styled(Paper)(({ theme }) => ({
-    ...theme.typography.body2,
-    textAlign: 'left',
-    color: theme.palette.text.secondary,
-    width: "60%",
-    padding: theme.spacing(4),
-    borderRadius: '1rem',
-    margin: '1rem',
-    // lineHeight: '60px',
-  }));
-
   // funcs
   const submitFirstStep = (data) => {
     // save data to state
@@ -97,7 +85,19 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Item elevation={5}>
+        <div style={{
+          // rounded corners, with drop shadow 45 deg from the top left
+          borderRadius: '1rem',
+          boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)',
+          // padding
+          padding: '3rem',
+          textAlign: 'left',
+          width: "60%",
+          borderRadius: '2rem',
+          margin: '4rem',
+          backgroundColor: 'white',
+          color: '#333',
+        }}>
           <Typography variant="h4" component="div" gutterBottom>
             DSAID File Upload
           </Typography>
@@ -134,7 +134,7 @@ function App() {
               />
             )
           }
-        </Item>
+        </div>
       </header>
     </div>
   );
