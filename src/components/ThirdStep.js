@@ -3,7 +3,9 @@ import { Typography, TextField, Button, FormControl, FormLabel, InputLabel, Inpu
 import axios from 'axios';
 
 function ThirdStep(props) {
-  let file_upload_endpoint = "https://dsaid-be.kenif.xyz/upload" 
+  // let endpoint = "http://127.0.0.1:8001"
+  let endpoint = "https://dsaid-be.kenif.xyz"
+  let file_upload_endpoint = endpoint + "/upload" 
   // could move this to a config file, but for demo purposes will leave it here for now
 
   // states
@@ -16,6 +18,7 @@ function ThirdStep(props) {
   const [failReason, setFailReason] = useState("");
   const [uploadCancelled, setUploadCancelled] = useState(false);
   const [uploadingText, setUploadingText] = useState("Starting Upload 🚀");
+  const [videoWatchUrl, setVideoWatchUrl] = useState("");
   
   // refs
   const uploadRequestRef = useRef(null);
@@ -54,12 +57,16 @@ function ThirdStep(props) {
     uploadRequestRef.current = axios.post(file_upload_endpoint, formData, config);
   
     return uploadRequestRef.current.then(response => {
-        // console.log(response);
+        console.log(response);
         setUploadRunning(false)
         setUploadCompleted(true)
         setUploadResult(true)
         setProgressValue(100);
         // do something with the response data
+        if (response.data.success) {
+          let watchUrl = endpoint + "/watch/" + response.data.videoId;
+          setVideoWatchUrl(watchUrl)
+        }
       })
       .catch(error => {
         if (axios.isCancel(error)) {
@@ -161,7 +168,7 @@ function ThirdStep(props) {
 
       { // show success/fail alerts when upload is completed
         uploadCompleted && (uploadResult ? (
-          <SuccessAlert/>
+          <SuccessAlert videoWatchUrl={videoWatchUrl}/>
         ) : (
           <FailureAlert reason={failReason}/>
         ))
@@ -200,10 +207,12 @@ function ThirdStep(props) {
   );
 }
 
-function SuccessAlert() {
+function SuccessAlert(props) {
+  let videoWatchUrl = props.videoWatchUrl
   return (
     <Alert severity="success">
-      <strong>Upload completed successfully!</strong>
+      <AlertTitle><strong>Upload completed successfully! 🎉</strong></AlertTitle>
+      <Typography>You can watch it at <a href={videoWatchUrl} target="_blank" rel="noreferrer">{videoWatchUrl}</a></Typography>
     </Alert>
   )
 }
@@ -211,7 +220,7 @@ function SuccessAlert() {
 function FailureAlert(props) {
   return (
     <Alert severity="error">
-      <AlertTitle><strong>Upload Failed</strong></AlertTitle>
+      <AlertTitle><strong>Upload Failed 😔</strong></AlertTitle>
       <Typography>Reason: {props.reason}</Typography>
     </Alert>
   )

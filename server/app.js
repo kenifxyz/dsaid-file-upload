@@ -10,12 +10,12 @@ const { v4: uuidv4 } = require('uuid'); // to reduce file upload collisions
 dotenv.config();
 
 const app = express();
-// app.use(cors());
-app.use(cors({
-  origin: [
-    'https://dsaid-fe.kenif.xyz'
-  ]
-}));
+app.use(cors());
+// app.use(cors({
+//   origin: [
+//     'https://dsaid-fe.kenif.xyz'
+//   ]
+// }));
 
 const port = process.env.PORT || 8080;
 
@@ -144,6 +144,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
   res.status(200).json({
     success: true,
     message: `Video uploaded with ID ${newVideo.id}`,
+    videoId: newVideo.id,
   });
 
 });
@@ -206,7 +207,7 @@ app.get('/watch/:videoId', async (req, res) => {
     const chunksize = (end-start)+1;
     const file = fs.createReadStream(storagePath, {start, end});
     const head = {
-      'Content-Range': bytes ${start}-${end}/${fileSize},
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
       'Content-Type': 'video/mp4',
