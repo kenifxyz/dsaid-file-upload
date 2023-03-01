@@ -11,7 +11,10 @@ dotenv.config();
 const app = express();
 // app.use(cors());
 app.use(cors({
-  origin: 'https://dsaid-file-upload.netlify.app'
+  origin: [
+    'https://dsaid-file-upload.netlify.app',
+    'https://dsaid-fe.kenif.xyz'
+  ]
 }));
 
 const port = process.env.PORT || 8080;

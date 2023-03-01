@@ -101,7 +101,6 @@ function App() {
           <Typography variant="h4" component="div" gutterBottom>
             DSAID File Upload
           </Typography>
-          <Button onClick={() => setCurrentStep(2)}>Restart</Button>
           <Breadcrumbs separator="›" aria-label="breadcrumb">
             {breadcrumbs}
           </Breadcrumbs>
