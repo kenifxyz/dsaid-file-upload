@@ -171,6 +171,57 @@ app.get('/test_db', async (req, res) => {
     });
     }
 });
+
+// get route to view an uploaded video
+app.get('/watch/:videoId', async (req, res) => {
+  const videoId = req.params.videoId;
+  
+  // find the video in the database
+  const video = await Video.findByPk(videoId);
+  
+  if (!video) {
+    return res.status(404).json({
+    success: false,
+    message: 'Video not found on database',
+    });
+  }
+  
+  const { storagePath } = video;
+  
+  if (!storagePath) {
+    return res.status(404).json({
+    success: false,
+    message: 'Video file does not exist',
+    });
+  }
+  
+  // stream the video file to the client
+  const stat = fs.statSync(storagePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1;
+    const chunksize = (end-start)+1;
+    const file = fs.createReadStream(storagePath, {start, end});
+    const head = {
+      'Content-Range': bytes ${start}-${end}/${fileSize},
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    };
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+      const head = {
+        'Content-Length': fileSize,
+        'Content-Type': 'video/mp4',
+      };
+      res.writeHead(200, head);
+      fs.createReadStream(storagePath).pipe(res);
+    }
+  });
     
 // start the server
 if (stage == "DEV") {
