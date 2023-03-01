@@ -27,9 +27,9 @@ function FirstStep(props) {
   // funcs
   const onVideoSelect = (video) => {
     setSelectedVideo(video);
-    console.log("creating thumbnail url")
+    // console.log("creating thumbnail url")
     setThumbnailUrl(URL.createObjectURL(video));
-    console.log("ok")
+    // console.log("ok")
   };
   
   const handleFileChange = (event) => {
@@ -116,9 +116,9 @@ function FirstStep(props) {
         videoUrl={thumbnailUrl}
         renderThumbnailHtml={false}
         thumbnailHandler={(thumbnail) => {
-          console.log("setting thumbnail data")
+          // console.log("setting thumbnail data")
           setThumbnailData(thumbnail)
-          console.log("ok")
+          // console.log("ok")
         }}
       />
     </div>
@@ -148,6 +148,8 @@ function FirstStep(props) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          display: "none",
+          overflow: "hidden",
         }}>
           <Typography variant="body1">
             {thumbnailData == "" ? "Loading Preview.." : "Video Preview"}
