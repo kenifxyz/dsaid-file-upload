@@ -49,6 +49,10 @@ const Video = sequelize.define('Video', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  uuid: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  }
 }, {
   timestamps: true, // disable timestamps (createdAt, updatedAt)
 });
@@ -103,13 +107,24 @@ app.post('/upload', upload.single('video'), async (req, res) => {
   }
   
 
+  // generate a random uuid for the file, and check if it already exists, until a unique one is found
+  let uuid = uuidv4();
+  uuid = uuid.replace(/-/g, '').substring(0, 8);
+  let fileExists = await Video.findOne({ where: { filename: `${uuid}.${fileExtension}` } });
+  while (fileExists) {
+    uuid = uuidv4();
+    uuid = uuid.replace(/-/g, '').substring(0, 8);
+    fileExists = await Video.findOne({ where: { filename: `${uuid}.${fileExtension}` } });
+  }
+
   // create a new Video instance with the metadata and filename
   const newVideo = await Video.create({
     title,
     location: location || null,
     start_time: new Date(startDateTime),
     filename: req.file.originalname,
-    storagePath: null
+    storagePath: null,
+    uuid
   });
 
   // get the Id of the newly created Video instance
@@ -120,6 +135,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
   // rename the file
   fs.renameSync(`uploads/${req.file.filename}`, storagePath);
 
+  
   // update the Video instance with the storage path
   await Video.update({
     storagePath,
@@ -143,8 +159,8 @@ app.post('/upload', upload.single('video'), async (req, res) => {
   // when completed, send a 200 response
   res.status(200).json({
     success: true,
-    message: `Video uploaded with ID ${newVideo.id}`,
-    videoId: newVideo.id,
+    message: `Video uploaded with ID ${newVideo.uuid}`,
+    videoId: newVideo.uuid,
   });
 
 });
@@ -177,8 +193,8 @@ app.get('/test_db', async (req, res) => {
 app.get('/watch/:videoId', async (req, res) => {
   const videoId = req.params.videoId;
   
-  // find the video in the database
-  const video = await Video.findByPk(videoId);
+  // find the video in the database by uuid
+  const video = await Video.findOne({ where: { uuid: videoId } });
   
   if (!video) {
     return res.status(404).json({
