@@ -3,7 +3,8 @@ import { Typography, TextField, Button, FormControl, FormLabel, InputLabel, Inpu
 import axios from 'axios';
 
 function ThirdStep(props) {
-  let file_upload_endpoint = "http://188.166.176.84/upload"
+  let file_upload_endpoint = "http://188.166.176.84:8080/upload" 
+  // could move this to a config file, but for demo purposes will leave it here for now
 
   // states
   const data = props.metadata;
