@@ -1,0 +1,10 @@
+CREATE TABLE Videos (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  location VARCHAR(255),
+  start_time TIMESTAMP NOT NULL,
+  filename VARCHAR(255) NOT NULL,
+  storagePath VARCHAR(255),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
