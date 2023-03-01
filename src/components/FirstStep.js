@@ -111,6 +111,8 @@ function FirstStep(props) {
       zIndex: -1,
       width: "0",
       height: "0",
+      display: "none",
+      overflow: "hidden",
     }}>
       <VideoImageThumbnail
         videoUrl={thumbnailUrl}
@@ -148,8 +150,6 @@ function FirstStep(props) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          display: "none",
-          overflow: "hidden",
         }}>
           <Typography variant="body1">
             {thumbnailData == "" ? "Loading Preview.." : "Video Preview"}
